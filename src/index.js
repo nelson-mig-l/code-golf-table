@@ -8,9 +8,19 @@ const head = `
 		writing-mode: vertical-rl;
 		transform: rotate(180deg);
 	}
+
+	.light {
+		font-size: 8px;
+		color: #AAA;
+		width: 100%;
+		text-align: center;
+	}
+
+	body {
+		font-family: Lato,sans-serif !important;
+	}
 	
 	table {
-		font-family: Lato,sans-serif !important;
 		font-size: 14px;
 		border-collapse: collapse;
 		/*width: 100%;*/
@@ -63,7 +73,7 @@ const languages = [
 	'Java', 'Javascript',
 	'Kotlin',
 	'Lua',
-	'ObjectiveC', 'Ocaml',
+	'ObjectiveC', 'OCaml',
 	'Pascal', 'Perl', 'PHP', 'Python3',
 	'Ruby', 'Rust',
 	'Scala', 'Swift',
@@ -83,10 +93,10 @@ async function handleRequest() {
 			'content-type': 'application/json;charset=UTF-8',
 		},
 	};
-	const response = await fetch(url, init);
-	const json = await response.json();
-	const puzzles = json['puzzles'];
-	const golfs = puzzles.filter(p => p.puzzleType === "GOLF");
+	const response = await fetch(url, init)
+	const json = await response.json()
+	const puzzles = json['puzzles']
+	const golfs = puzzles.filter(p => p.puzzleType === "GOLF")
 
 	var html = '<!DOCTYPE html><html>'
 	html += head;
@@ -94,8 +104,7 @@ async function handleRequest() {
 
 	html += '<thead><tr><th class="vertical"></th>';
 	languages.forEach(language => {
-		//html += '<th><div class="vertical">' + language + '</div></th>';
-		html += '<th class="vertical">' + language + '</th>';
+		html += '<th class="vertical">' + language + '</th>'
 	});
 	html += '</tr></thead>'
 
@@ -103,21 +112,28 @@ async function handleRequest() {
 	golfs.forEach(golf => {
 		html += '<tr><td>' + golf.labelTitle + '</td>';
 		languages.forEach(language => {
-			const points = golf.pointsByLanguage[language] || 0;
-			html += '<td>' + points + '</td>';
+			const points = golf.pointsByLanguage[language] || 0
+			const rank = golf.ranksByLanguage[language] || '-'
+			const players = golf.totalPlayersByLanguage[language] || '-'
+			html += '<td>'
+			html += points
+			html += '<br/><div class="light"><b>' + rank + '</b><br/>' + players + "</div>"
+			html += '</td>'
 		});
 		html += '</tr>'
-	})
+	});
 	html += '</tbody>'
 
-	html += '</table></body>'
+	html += '</table>'
+	html += '<p class="light">Generated: ' + new Date().toLocaleString("UK") + '</p>'
+	html += '</body>'
 	html += '</html>'
 	return new Response(html, {
 		headers: {
 			'content-type': 'text/html;charset=UTF-8'
 		},
 	});
-}
+};
 
 addEventListener('fetch', event => {
 	return event.respondWith(handleRequest());
